@@ -153,12 +153,15 @@ public class Gost {
     public static void main(String[] args) {
         Crypt gost = new Crypt(key, blocks);
 
-        String originalText = "ABOBA 12345 ";
+        String originalText = "ABOBA 12345";
+        System.out.println("Исходный текст: " + originalText);
         String encrypted = gost.encryptText(originalText);
         System.out.println("Зашифрованный текст (Base64): " + encrypted);
 
         String decrypted = gost.decryptText(encrypted);
         System.out.println("Расшифрованный текст: " + decrypted);
+
+        System.out.println(decrypted.equals(originalText)? "ВСЕ ОК!!":"ТЕКСТ НЕ СОВПАДАЕТ, АХТУНГ!!!!");
     }
 
 }
