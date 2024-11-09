@@ -1,3 +1,5 @@
+package com.dimka228.messanger.crypt;
+
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -18,21 +20,41 @@ public class Gost {
         {1, 15, 13, 0, 5, 7, 10, 4, 9, 2, 3, 14, 6, 11, 8, 12}
     };
     
-    private static final BigInteger key = new BigInteger("1831827938791238791");
+    private static final String key = "abobasdfjldskfjk1831827938791238791";
 
-    private static class Crypt {
+    public static class Crypt {
         private BigInteger[] subkeys;
         private int[][] sbox;
 
-        public Crypt(BigInteger key, int[][] sbox) {
+        public Crypt(String key, int[][] sbox) {
             this.sbox = sbox;
             setKey(key);
         }
+        public Crypt() {
+            this.sbox = blocks;
+            setKey(Gost.key);
+        }
 
-        private void setKey(BigInteger key) {
+        private void setKey(String key) {
+
             this.subkeys = new BigInteger[8];
-            for (int i = 0; i < 8; i++) {
-                subkeys[i] = key.shiftRight(32 * i).and(BigInteger.valueOf(0xFFFFFFFFL));
+            byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+
+            byte[] inputBytes = new byte[64];
+            System.arraycopy(keyBytes, 0, inputBytes, 0, keyBytes.length);
+            int sub = 0;
+            for (int i = 0; i < inputBytes.length; i += 8) {
+                byte[] block = new byte[8];
+                int blockLength = Math.min(8, inputBytes.length - i);
+                System.arraycopy(inputBytes, i, block, 0, blockLength);
+
+               
+                BigInteger blockData = new BigInteger(1, block);
+                
+
+                subkeys[sub] = blockData;
+                
+                sub+=1;
             }
         }
 
@@ -151,9 +173,9 @@ public class Gost {
     }
 
     public static void main(String[] args) {
-        Crypt gost = new Crypt(key, blocks);
+        Gost.Crypt gost = new Gost.Crypt();
 
-        String originalText = "ABOBA 12345";
+        String originalText = "АААА";
         System.out.println("Исходный текст: " + originalText);
         String encrypted = gost.encryptText(originalText);
         System.out.println("Зашифрованный текст (Base64): " + encrypted);
@@ -165,4 +187,3 @@ public class Gost {
     }
 
 }
-
